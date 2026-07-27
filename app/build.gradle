@@ -1,0 +1,27 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace "com.aerocast.widgetapp"
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "com.aerocast.widgetapp"
+        minSdk 24
+        targetSdk 36
+        versionCode 1
+        versionName "1.0"
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+}
+
+dependencies {
+    implementation("androidx.glance:glance-appwidget:1.1.1")
+    implementation( "androidx.glance:glance-material3:1.1.1")
+    implementation("androidx.compose.runtime:runtime:1.8.0")
+}
