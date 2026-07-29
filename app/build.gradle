@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'org.jetbrains.kotlin.plugin.compose'
 }
 
 android {
@@ -18,10 +19,20 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
+
+    buildFeatures {
+        compose true
+    }
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(
+                org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
+            )
+        }
+    }
 }
 
 dependencies {
     implementation("androidx.glance:glance-appwidget:1.1.1")
-    implementation( "androidx.glance:glance-material3:1.1.1")
-    implementation("androidx.compose.runtime:runtime:1.8.0")
 }

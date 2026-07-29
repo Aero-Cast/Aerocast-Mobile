@@ -6,10 +6,10 @@
 
     <application
         android:label="AeroCast Widget">
-
+        
         <receiver
-            android:name=".HelloWidgetReceiver"
-            android:exported="true">
+            android:name=".receivers.AQICurrentWidgetReceiver"
+            android:exported="false">
 
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
@@ -17,7 +17,7 @@
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/hello_widget_info"/>
+                android:resource="@xml/aqi_current_widget_info"/>
         </receiver>
 
     </application>
