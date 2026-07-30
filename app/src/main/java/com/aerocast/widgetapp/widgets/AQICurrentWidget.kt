@@ -9,6 +9,7 @@ import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.provideContent
+import androidx.glance.appwidget.state.getAppWidgetState
 import androidx.glance.layout.*
 import androidx.glance.text.*
 import androidx.glance.unit.ColorProvider
@@ -18,19 +19,39 @@ import androidx.compose.ui.graphics.Color
 import com.aerocast.widgetapp.R
 import com.aerocast.widgetapp.utils.createCustomTextBitmap
 import com.aerocast.widgetapp.utils.createPillTextBitmap
+import com.aerocast.widgetapp.state.AQIInfo
+import com.aerocast.widgetapp.state.AQIInfoStateDefinition
 import android.graphics.Bitmap
 
 
 class AQICurrentWidget : GlanceAppWidget() {
 
+    override val stateDefinition = AQIInfoStateDefinition
+
     override suspend fun provideGlance(
         context: Context,
         id: GlanceId
     ) {
-        provideContent {
-            val currentAQI = 89
+        val state = getAppWidgetState(
+            context = context,
+            definition = AQIInfoStateDefinition,
+            glanceId = id
+        )
 
-            MyWidgetContent(context, currentAQI)
+        provideContent {
+            when(state){
+                is AQIInfo.Loading -> { MyWidgetContent( context, 1 ) }
+
+
+                is AQIInfo.Available -> {
+                    MyWidgetContent(
+                        context,
+                        state.currentAqi
+                    )
+                }
+
+                is AQIInfo.Unavailable -> { MyWidgetContent( context, 2 ) }
+            }
         }
     }
 }
