@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.plugin.compose'
     id 'org.jetbrains.kotlin.plugin.serialization' version "2.3.20"
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -40,4 +41,7 @@ dependencies {
     implementation("androidx.datastore:datastore:1.1.7")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
     implementation("com.squareup.okhttp3:okhttp:5.4.0")
+    implementation(platform("com.google.firebase:firebase-bom:34.2.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-firestore")
 }

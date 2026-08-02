@@ -6,11 +6,12 @@ import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.appwidget.updateAll
 import androidx.work.*
-import java.time.Duration
 import com.aerocast.widgetapp.widgets.AQICurrentWidget
 import com.aerocast.widgetapp.state.AQIInfo
 import com.aerocast.widgetapp.state.AQIInfoStateDefinition
 import com.aerocast.widgetapp.data.AQIRepository
+import java.util.concurrent.TimeUnit
+import android.util.Log
 
 class AQIUpdateWorker(
     appContext: Context,
@@ -23,15 +24,23 @@ class AQIUpdateWorker(
 
         fun enqueue(appContext: Context) {
             val manager = WorkManager.getInstance(appContext)
-            val requestBuilder = PeriodicWorkRequestBuilder<AQIUpdateWorker>(
-                Duration.ofMinutes(30)
-            )
-            var workPolicy = ExistingPeriodicWorkPolicy.KEEP
+            // val requestBuilder = PeriodicWorkRequestBuilder<AQIUpdateWorker>(
+            //     30,
+            //     TimeUnit.MINUTES
+            // )
 
-            manager.enqueueUniquePeriodicWork(
+            // For testing purposes, we can use a shorter interval
+            val requestBuilder = OneTimeWorkRequestBuilder<AQIUpdateWorker>()
+                .setInitialDelay(10, TimeUnit.SECONDS)
+                .build()
+                
+            // var workPolicy = ExistingPeriodicWorkPolicy.KEEP
+
+            manager.enqueueUniqueWork(
                 uniqueWorkName,
-                workPolicy,
-                requestBuilder.build()
+                // workPolicy,
+                ExistingWorkPolicy.KEEP,
+                requestBuilder
             )
         }
 
@@ -42,6 +51,7 @@ class AQIUpdateWorker(
     }
 
     override suspend fun doWork(): Result {
+        Log.d("AQIWorker", "Worker started")
         val manager = GlanceAppWidgetManager(applicationContext)
         val glanceIds = manager.getGlanceIds(AQICurrentWidget::class.java)
 
@@ -49,9 +59,14 @@ class AQIUpdateWorker(
             val data = AQIRepository.fetchAQI()
 
             // Update state to indicate loading
+            Log.d("AQIWorker", "Fetching AQI")
             setWidgetState(glanceIds, AQIInfo.Loading)
 
             // Update state with new data
+            Log.d(
+                "AQIWorker",
+                "AQI fetched: ${data.currentAqi}"
+            )
             setWidgetState(glanceIds,
                 AQIInfo.Available(
                     currentAqi = data.currentAqi,
@@ -59,9 +74,29 @@ class AQIUpdateWorker(
                 )
             )
 
+            Log.d("AQIWorker", "Widget updated")
+            val nextRequest = OneTimeWorkRequestBuilder<AQIUpdateWorker>()
+                .setInitialDelay(10, TimeUnit.SECONDS)
+                .build()
+
+            WorkManager.getInstance(applicationContext)
+                .enqueueUniqueWork(
+                    uniqueWorkName,
+                    ExistingWorkPolicy.REPLACE,
+                    nextRequest
+                )
+
+            
+            Log.d("AQIWorker", "Widget updated2")
             Result.success()
         } catch (e: Exception) {
             setWidgetState(glanceIds, AQIInfo.Unavailable(e.message.orEmpty()))
+            Log.e(
+                    "AQIWorker",
+                    "Failed: ${e.message}",
+                    e
+                )
+
             if (runAttemptCount < 3) {
                 // Exponential backoff strategy will avoid the request to repeat
                 // too fast in case of failures.

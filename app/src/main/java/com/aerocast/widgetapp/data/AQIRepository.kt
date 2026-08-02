@@ -1,9 +1,8 @@
 package com.aerocast.widgetapp.data
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import okhttp3.OkHttpClient
-import okhttp3.Request
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 
 @Serializable
 data class AQIResponse(
@@ -13,33 +12,26 @@ data class AQIResponse(
 
 object AQIRepository {
 
-    private val client = OkHttpClient()
+    private val db = FirebaseFirestore.getInstance()
 
-    private val json = Json {
-        ignoreUnknownKeys = true
-    }
+    suspend fun fetchAQI(): AQIResponse {
 
+        val historical_aqi = db.collection("historical_aqi")
+            .document("2026-08-04")
+            .get()
+            .await()
 
-    fun fetchAQI(): AQIResponse {
+        val aqi_forecasts = db.collection("aqi_forecasts")
+            .document("latest")
+            .get()
+            .await()
 
-        val request = Request.Builder()
-            .url("https://your-project.web.app/aqi.json")
-            .build()
+        val forecasts = aqi_forecasts.get("forecasts") as List<Map<String, Any>>
 
-
-        client.newCall(request).execute().use { response ->
-
-            if (!response.isSuccessful) {
-                throw Exception("HTTP ${response.code}")
-            }
-
-
-            val body = response.body.string()
-
-            return json.decodeFromString(
-                AQIResponse.serializer(),
-                body
-            )
-        }
+        return AQIResponse(
+            currentAqi = historical_aqi.getDouble("aqi")?.toInt() ?: 0,
+            forecastAqi = forecasts.map { (it["predicted_aqi"] as Double).toInt() }
+        )
+        
     }
 }
