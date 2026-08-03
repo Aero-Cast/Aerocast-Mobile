@@ -39,9 +39,14 @@ class AQIForecastWidget : GlanceAppWidget() {
         )
 
         provideContent {
-            when(state){
-                is AQIInfo.Loading -> { MyWidgetContent( context, 1, listOf(1, 2, 3, 4, 5) ) }
-
+            when(state) {
+                is AQIInfo.Loading -> {
+                    MyWidgetContent(
+                        context,
+                        null,
+                        null
+                    )
+                }
 
                 is AQIInfo.Available -> {
                     MyWidgetContent(
@@ -51,15 +56,22 @@ class AQIForecastWidget : GlanceAppWidget() {
                     )
                 }
 
-                is AQIInfo.Unavailable -> { MyWidgetContent( context, 21,  listOf(10, 12, 13, 14, 15)) }
+                is AQIInfo.Unavailable -> {
+                    MyWidgetContent(
+                        context,
+                        null,
+                        null
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun MyWidgetContent(context: Context, currentAqi: Int, forecastAqi: List<Int>) {
+fun MyWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<Int>?) {
     val category = when (currentAqi) {
+        null -> "..."
         in 0..50 -> "Good"
         in 51..100 -> "Moderate"
         in 101..150 -> "Unhealthy for Sensitive Groups"
@@ -68,31 +80,38 @@ fun MyWidgetContent(context: Context, currentAqi: Int, forecastAqi: List<Int>) {
         else -> "Hazardous"
     }
 
-    val pred_category = when (forecastAqi[0]) {
-        in 0..50 -> "Good"
-        in 51..100 -> "Moderate"
-        in 101..150 -> "Unhealthy for Sensitive Groups"
-        in 151..200 -> "Unhealthy"
-        in 201..300 -> "Very Unhealthy"
-        else -> "Hazardous"
+    fun getAqiCategory(aqi: Int?): String {
+        return when (aqi) {
+            null -> "-"
+            in 0..50 -> "Good"
+            in 51..100 -> "Moderate"
+            in 101..150 -> "Unhealthy for Sensitive Groups"
+            in 151..200 -> "Unhealthy"
+            in 201..300 -> "Very Unhealthy"
+            else -> "Hazardous"
+        }
     }
 
     val currentAqiColor = when (currentAqi) {
+        null -> Color(0xFF00361C)
         in 0..50 -> Color(0xFF00361C) // Green
-        in 51..100 -> Color(0xFFFFF700) // Yellow
-        in 101..150 -> Color(0xFFFF7E00) // Orange
-        in 151..200 -> Color(0xFFFF0000) // Red
-        in 201..300 -> Color(0xFF8F3F97) // Purple
-        else -> Color(0xFF7E0023) // Maroon
+        in 51..100 -> Color(0xB87801) // Yellow
+        in 101..150 -> Color(0xB95600) // Orange
+        in 151..200 -> Color(0xB10909) // Red
+        in 201..300 -> Color(0x5E0063) // Purple
+        else -> Color(0xA39E9E) // Gray
     }
 
-    val forecastAqiColor = when (forecastAqi[0]) {
-        in 0..50 -> Color(0xFF00361C) // Green
-        in 51..100 -> Color(0xFFFFF700) // Yellow
-        in 101..150 -> Color(0xFFFF7E00) // Orange
-        in 151..200 -> Color(0xFFFF0000) // Red
-        in 201..300 -> Color(0xFF8F3F97) // Purple
-        else -> Color(0xFF7E0023) // Maroon
+    fun getAqiColor(aqi: Int?): Color {
+        return when (aqi) {
+            null -> Color(0xFF00361C)
+            in 0..50 -> Color(0xFF00361C)
+            in 51..100 -> Color(0xB87801)
+            in 101..150 -> Color(0xB95600)
+            in 151..200 -> Color(0xB10909)
+            in 201..300 -> Color(0x5E0063)
+            else -> Color(0xA39E9E)
+        }
     }
 
     @Composable
@@ -108,7 +127,7 @@ fun MyWidgetContent(context: Context, currentAqi: Int, forecastAqi: List<Int>) {
     }
 
     @Composable
-    fun row_items(weekday: String, date: String, aqi: Int, category: String, aqiColor: Color) {
+    fun row_items(weekday: String, date: String, aqi: Int?, category: String, aqiColor: Color) {
         Column(
             modifier = GlanceModifier
                 .padding(horizontal = 4.dp),
@@ -149,9 +168,9 @@ fun MyWidgetContent(context: Context, currentAqi: Int, forecastAqi: List<Int>) {
                 provider = ImageProvider(
                     createCustomTextBitmap(
                         context = context,
-                        text = "${aqi}",
+                        text = aqi?.toString() ?: "-",
                         textColor = aqiColor,
-                        fontSize = 32f,
+                        fontSize = 27f,
                         fontFamily = "fonts/SF-Pro-Rounded-Heavy.ttf",
                     )
                 )
@@ -217,23 +236,23 @@ fun MyWidgetContent(context: Context, currentAqi: Int, forecastAqi: List<Int>) {
 
                 row_gap()
 
-                row_items("TUE", "Aug 4", forecastAqi[0], pred_category, forecastAqiColor)
+                row_items("TUE", "Aug 4", forecastAqi?.getOrNull(0), getAqiCategory(forecastAqi?.getOrNull(0)), getAqiColor(forecastAqi?.getOrNull(0)))
 
                 row_gap()
 
-                row_items("WED", "Aug 5", forecastAqi[1], pred_category, forecastAqiColor)
+                row_items("WED", "Aug 5", forecastAqi?.getOrNull(1), getAqiCategory(forecastAqi?.getOrNull(1)), getAqiColor(forecastAqi?.getOrNull(1)))
 
                 row_gap()
 
-                row_items("THU", "Aug 6", forecastAqi[2], pred_category, forecastAqiColor)
+                row_items("THU", "Aug 6", forecastAqi?.getOrNull(2), getAqiCategory(forecastAqi?.getOrNull(2)), getAqiColor(forecastAqi?.getOrNull(2)))
 
                 row_gap()
 
-                row_items("FRI", "Aug 7", forecastAqi[3], pred_category, forecastAqiColor)
+                row_items("FRI", "Aug 7", forecastAqi?.getOrNull(3), getAqiCategory(forecastAqi?.getOrNull(3)), getAqiColor(forecastAqi?.getOrNull(3)))
 
                 row_gap()
 
-                row_items("SAT", "Aug 8", forecastAqi[4], pred_category, forecastAqiColor)
+                row_items("SAT", "Aug 8", forecastAqi?.getOrNull(4), getAqiCategory(forecastAqi?.getOrNull(4)), getAqiColor(forecastAqi?.getOrNull(4)))
             }
         }
     }
