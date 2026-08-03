@@ -5,8 +5,10 @@ import androidx.glance.GlanceId
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.appwidget.updateAll
+import androidx.glance.appwidget.GlanceAppWidget
 import androidx.work.*
 import com.aerocast.widgetapp.widgets.AQICurrentWidget
+import com.aerocast.widgetapp.widgets.AQIForecastWidget
 import com.aerocast.widgetapp.state.AQIInfo
 import com.aerocast.widgetapp.state.AQIInfoStateDefinition
 import com.aerocast.widgetapp.data.AQIRepository
@@ -53,26 +55,48 @@ class AQIUpdateWorker(
     override suspend fun doWork(): Result {
         Log.d("AQIWorker", "Worker started")
         val manager = GlanceAppWidgetManager(applicationContext)
-        val glanceIds = manager.getGlanceIds(AQICurrentWidget::class.java)
+        val currentIds = manager.getGlanceIds(AQICurrentWidget::class.java)
+        val forecastIds = manager.getGlanceIds(AQIForecastWidget::class.java)
 
         return try {
             val data = AQIRepository.fetchAQI()
 
             // Update state to indicate loading
             Log.d("AQIWorker", "Fetching AQI")
-            setWidgetState(glanceIds, AQIInfo.Loading)
+            setWidgetState(
+                currentIds,
+                AQIInfo.Loading,
+                AQICurrentWidget()
+            )
+
+            setWidgetState(
+                forecastIds,
+                AQIInfo.Loading,
+                AQIForecastWidget()
+            )
 
             // Update state with new data
             Log.d(
                 "AQIWorker",
                 "AQI fetched: ${data.currentAqi}"
             )
-            setWidgetState(glanceIds,
+            setWidgetState(
+                currentIds,
                 AQIInfo.Available(
                     currentAqi = data.currentAqi,
                     forecastAqi = data.forecastAqi
-                )
+                ),
+                AQICurrentWidget()
             )
+
+            setWidgetState(
+                forecastIds,
+                AQIInfo.Available(
+                    currentAqi = data.currentAqi,
+                    forecastAqi = data.forecastAqi
+                ),
+                AQIForecastWidget()
+)
 
             Log.d("AQIWorker", "Widget updated")
             val nextRequest = OneTimeWorkRequestBuilder<AQIUpdateWorker>()
@@ -90,7 +114,19 @@ class AQIUpdateWorker(
             Log.d("AQIWorker", "Widget updated2")
             Result.success()
         } catch (e: Exception) {
-            setWidgetState(glanceIds, AQIInfo.Unavailable(e.message.orEmpty()))
+            val unavailable = AQIInfo.Unavailable(e.message.orEmpty())
+
+            setWidgetState(
+                currentIds,
+                AQIInfo.Unavailable(e.message.orEmpty()),
+                AQICurrentWidget()
+            )
+
+            setWidgetState(
+                forecastIds,
+                AQIInfo.Unavailable(e.message.orEmpty()),
+                AQIForecastWidget()
+            )
             Log.e(
                     "AQIWorker",
                     "Failed: ${e.message}",
@@ -110,7 +146,11 @@ class AQIUpdateWorker(
     /**
      * Update the state of all widgets and then force update UI
      */
-    private suspend fun setWidgetState(glanceIds: List<GlanceId>, newState: AQIInfo) {
+    private suspend fun setWidgetState(
+        glanceIds: List<GlanceId>,
+        newState: AQIInfo,
+        widget: GlanceAppWidget
+    ) {
         glanceIds.forEach { glanceId ->
             updateAppWidgetState(
                 context = applicationContext,
@@ -119,6 +159,7 @@ class AQIUpdateWorker(
                 updateState = { newState }
             )
         }
-        AQICurrentWidget().updateAll(applicationContext)
+
+        widget.updateAll(applicationContext)
     }
 }

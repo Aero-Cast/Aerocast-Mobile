@@ -32,6 +32,11 @@ object AQIRepository {
             currentAqi = historical_aqi.getDouble("aqi")?.toInt() ?: 0,
             forecastAqi = forecasts.map { (it["predicted_aqi"] as Double).toInt() }
         )
+
+        // return AQIResponse(
+        //     currentAqi = 50,
+        //     forecastAqi = listOf(40, 50, 60, 70, 80)
+        // )
         
     }
 }

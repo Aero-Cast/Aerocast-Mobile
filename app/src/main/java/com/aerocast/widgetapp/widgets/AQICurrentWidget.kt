@@ -40,7 +40,7 @@ class AQICurrentWidget : GlanceAppWidget() {
 
         provideContent {
             when(state){
-                is AQIInfo.Loading -> { MyWidgetContent( context, 1 ) }
+                is AQIInfo.Loading -> { MyWidgetContent( context, null ) }
 
 
                 is AQIInfo.Available -> {
@@ -50,19 +50,23 @@ class AQICurrentWidget : GlanceAppWidget() {
                     )
                 }
 
-                is AQIInfo.Unavailable -> { MyWidgetContent( context, 2 ) }
+                is AQIInfo.Unavailable -> { MyWidgetContent( context, null ) }
             }
         }
     }
 }
 
 @Composable
-fun MyWidgetContent(context: Context, currentAQI: Int) {
+fun MyWidgetContent(context: Context, currentAQI: Int?) {
     val backgroundImage: Int
     val themeColor: Color
     val statusText: String
 
-    if (currentAQI >= 50) {
+    if (currentAQI == null) {
+        backgroundImage = R.drawable.good_aqi_current_widget_background
+        themeColor = Color(0xFF00361C)
+        statusText = "Loading"
+    } else if (currentAQI >= 50) {
         backgroundImage = R.drawable.bad_aqi_current_widget_background
         themeColor = Color(0xFF362300)
         statusText = "Fair Air Quality"
@@ -118,7 +122,7 @@ fun MyWidgetContent(context: Context, currentAQI: Int) {
                     provider = ImageProvider(
                         createCustomTextBitmap(
                             context = context,
-                            text = currentAQI.toString(),
+                            text = currentAQI?.toString() ?: "-",
                             textColor = themeColor,
                             fontSize = 172f,
                             fontFamily = "fonts/SF-Pro-Rounded-Heavy.ttf"
