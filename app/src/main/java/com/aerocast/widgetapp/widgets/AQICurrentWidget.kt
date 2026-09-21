@@ -50,7 +50,7 @@ class AQICurrentWidget : GlanceAppWidget() {
                     )
                 }
 
-                is AQIInfo.Unavailable -> { MyWidgetContent( context, null ) }
+                is AQIInfo.Unavailable -> { MyWidgetContent( context, 0 ) }
             }
         }
     }

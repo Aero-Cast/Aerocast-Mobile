@@ -53,16 +53,29 @@ class AQIUpdateWorker(
     }
 
     override suspend fun doWork(): Result {
-        Log.d("AQIWorker", "Worker started")
+        Log.d("AQIWorker", "===== WORKER STARTED =====")
+
         val manager = GlanceAppWidgetManager(applicationContext)
+
+        Log.d("AQIWorker", "Getting current widget IDs")
         val currentIds = manager.getGlanceIds(AQICurrentWidget::class.java)
+
+        Log.d("AQIWorker", "Current widget IDs: $currentIds")
+
+        Log.d("AQIWorker", "Getting forecast widget IDs")
         val forecastIds = manager.getGlanceIds(AQIForecastWidget::class.java)
 
+        Log.d("AQIWorker", "Forecast widget IDs: $forecastIds")
+
         return try {
+            Log.d("AQIWorker", "About to fetch AQI...")
+
             val data = AQIRepository.fetchAQI()
 
-            // Update state to indicate loading
-            Log.d("AQIWorker", "Fetching AQI")
+            Log.d("AQIWorker", "AQI fetch completed!")
+            Log.d("AQIWorker", "Current AQI: ${data.currentAqi}")
+            Log.d("AQIWorker", "Forecast AQI: ${data.forecastAqi}")
+
             setWidgetState(
                 currentIds,
                 AQIInfo.Loading,
@@ -75,11 +88,6 @@ class AQIUpdateWorker(
                 AQIForecastWidget()
             )
 
-            // Update state with new data
-            Log.d(
-                "AQIWorker",
-                "AQI fetched: ${data.currentAqi}"
-            )
             setWidgetState(
                 currentIds,
                 AQIInfo.Available(
@@ -96,7 +104,7 @@ class AQIUpdateWorker(
                     forecastAqi = data.forecastAqi
                 ),
                 AQIForecastWidget()
-)
+            )
 
             Log.d("AQIWorker", "Widget updated")
             val nextRequest = OneTimeWorkRequestBuilder<AQIUpdateWorker>()

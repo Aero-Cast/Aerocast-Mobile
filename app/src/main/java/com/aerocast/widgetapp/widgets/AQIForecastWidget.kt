@@ -49,6 +49,11 @@ class AQIForecastWidget : GlanceAppWidget() {
                 }
 
                 is AQIInfo.Available -> {
+                    android.util.Log.d(
+                        "AQIForecastWidget",
+                        "currentAqi=${state.currentAqi}, forecastAqi=${state.forecastAqi}"
+                    )
+
                     MyWidgetContent(
                         context,
                         state.currentAqi,
@@ -95,10 +100,10 @@ fun MyWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<Int>?)
     val currentAqiColor = when (currentAqi) {
         null -> Color(0xFF00361C)
         in 0..50 -> Color(0xFF00361C) // Green
-        in 51..100 -> Color(0xB87801) // Yellow
-        in 101..150 -> Color(0xB95600) // Orange
-        in 151..200 -> Color(0xB10909) // Red
-        in 201..300 -> Color(0x5E0063) // Purple
+        in 51..100 -> Color(0xFFB87801) // Yellow
+        in 101..150 -> Color(0xFFB95600) // Orange
+        in 151..200 -> Color(0xFFB10909) // Red
+        in 201..300 -> Color(0xFF5E0063) // Purple
         else -> Color(0xA39E9E) // Gray
     }
 
@@ -106,10 +111,10 @@ fun MyWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<Int>?)
         return when (aqi) {
             null -> Color(0xFF00361C)
             in 0..50 -> Color(0xFF00361C)
-            in 51..100 -> Color(0xB87801)
-            in 101..150 -> Color(0xB95600)
-            in 151..200 -> Color(0xB10909)
-            in 201..300 -> Color(0x5E0063)
+            in 51..100 -> Color(0xFFB87801)
+            in 101..150 -> Color(0xFFB95600)
+            in 151..200 -> Color(0xFFB10909)
+            in 201..300 -> Color(0xFF5E0063)
             else -> Color(0xA39E9E)
         }
     }
@@ -139,7 +144,7 @@ fun MyWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<Int>?)
                     createCustomTextBitmap(
                         context = context,
                         text = weekday,
-                        textColor = aqiColor,
+                        textColor = Color(0xFF00361C),
                         fontSize = 16f,
                         fontFamily = "fonts/SF-Pro-Rounded-Heavy.ttf",
                     )
@@ -154,7 +159,7 @@ fun MyWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<Int>?)
                     createCustomTextBitmap(
                         context = context,
                         text = date,
-                        textColor = aqiColor,
+                        textColor = Color(0xFF00361C),
                         fontSize = 12f,
                         fontFamily = "fonts/SF-Pro-Regular.ttf",
                     )
