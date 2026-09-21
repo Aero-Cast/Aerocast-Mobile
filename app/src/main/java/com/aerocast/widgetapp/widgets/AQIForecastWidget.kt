@@ -41,7 +41,7 @@ class AQIForecastWidget : GlanceAppWidget() {
         provideContent {
             when(state) {
                 is AQIInfo.Loading -> {
-                    MyWidgetContent(
+                    ForecastWidgetContent(
                         context,
                         null,
                         null
@@ -54,7 +54,7 @@ class AQIForecastWidget : GlanceAppWidget() {
                         "currentAqi=${state.currentAqi}, forecastAqi=${state.forecastAqi}"
                     )
 
-                    MyWidgetContent(
+                    ForecastWidgetContent(
                         context,
                         state.currentAqi,
                         state.forecastAqi
@@ -62,7 +62,7 @@ class AQIForecastWidget : GlanceAppWidget() {
                 }
 
                 is AQIInfo.Unavailable -> {
-                    MyWidgetContent(
+                    ForecastWidgetContent(
                         context,
                         null,
                         null
@@ -74,7 +74,7 @@ class AQIForecastWidget : GlanceAppWidget() {
 }
 
 @Composable
-fun MyWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<Int>?) {
+fun ForecastWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<Int>?) {
     val category = when (currentAqi) {
         null -> "..."
         in 0..50 -> "Good"
