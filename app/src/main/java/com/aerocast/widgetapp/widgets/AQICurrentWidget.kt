@@ -40,24 +40,24 @@ class AQICurrentWidget : GlanceAppWidget() {
 
         provideContent {
             when(state){
-                is AQIInfo.Loading -> { MyWidgetContent( context, null ) }
+                is AQIInfo.Loading -> { CurrentWidgetContent( context, null ) }
 
 
                 is AQIInfo.Available -> {
-                    MyWidgetContent(
+                    CurrentWidgetContent(
                         context,
                         state.currentAqi
                     )
                 }
 
-                is AQIInfo.Unavailable -> { MyWidgetContent( context, 0 ) }
+                is AQIInfo.Unavailable -> { CurrentWidgetContent( context, null ) }
             }
         }
     }
 }
 
 @Composable
-fun MyWidgetContent(context: Context, currentAQI: Int?) {
+fun CurrentWidgetContent(context: Context, currentAQI: Int?) {
     val backgroundImage: Int
     val themeColor: Color
     val statusText: String
