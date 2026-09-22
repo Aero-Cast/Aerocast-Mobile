@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 
 class AQITipsActivity : ComponentActivity() {
 
@@ -211,4 +212,14 @@ fun AdvisoryCard(data: AdvisoryItemData) {
             }
         }
     }
+}
+
+@Preview(
+    showBackground = true,
+    widthDp = 360,
+    heightDp = 800
+)
+@Composable
+fun AQITipsScreenPreview() {
+    AQITipsScreen()
 }

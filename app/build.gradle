@@ -3,11 +3,13 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.compose'
     id 'org.jetbrains.kotlin.plugin.serialization' version "2.3.20"
     id 'com.google.gms.google-services'
+    id 'com.android.compose.screenshot' version '0.0.1-alpha16'
 }
 
 android {
     namespace "com.aerocast.widgetapp"
     compileSdk 37
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
 
     defaultConfig {
         applicationId "com.aerocast.widgetapp"
@@ -45,6 +47,9 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.material3:material3")
     implementation("com.google.android.material:material:1.14.0")
+    screenshotTestImplementation("com.android.tools.screenshot:screenshot-validation-api:0.0.1-alpha16")
+    screenshotTestImplementation("androidx.compose.ui:ui-tooling")
+    implementation("androidx.compose.ui:ui-tooling-preview")
 
     implementation("androidx.glance:glance-appwidget:1.1.1")
     implementation("androidx.work:work-runtime-ktx:2.11.2")
