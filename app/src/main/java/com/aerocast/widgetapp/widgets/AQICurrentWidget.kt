@@ -40,24 +40,24 @@ class AQICurrentWidget : GlanceAppWidget() {
 
         provideContent {
             when(state){
-                is AQIInfo.Loading -> { MyWidgetContent( context, null ) }
+                is AQIInfo.Loading -> { CurrentWidgetContent( context, null ) }
 
 
                 is AQIInfo.Available -> {
-                    MyWidgetContent(
+                    CurrentWidgetContent(
                         context,
                         state.currentAqi
                     )
                 }
 
-                is AQIInfo.Unavailable -> { MyWidgetContent( context, null ) }
+                is AQIInfo.Unavailable -> { CurrentWidgetContent( context, null ) }
             }
         }
     }
 }
 
 @Composable
-fun MyWidgetContent(context: Context, currentAQI: Int?) {
+fun CurrentWidgetContent(context: Context, currentAQI: Int?) {
     val backgroundImage: Int
     val themeColor: Color
     val statusText: String
@@ -101,7 +101,7 @@ fun MyWidgetContent(context: Context, currentAQI: Int?) {
                         textColor = Color.White,
                         backgroundColor = themeColor,
                         fontSize = 16f,
-                        fontFamily = "fonts/SF-Pro-Regular.ttf",
+                        fontFamily = "fonts/sf_pro_regular.ttf",
                         horizontalPadding = 8,
                         verticalPadding = 6,
                         cornerRadius = 32f,
@@ -125,7 +125,7 @@ fun MyWidgetContent(context: Context, currentAQI: Int?) {
                             text = currentAQI?.toString() ?: "-",
                             textColor = themeColor,
                             fontSize = 172f,
-                            fontFamily = "fonts/SF-Pro-Rounded-Heavy.ttf"
+                            fontFamily = "fonts/sf_pro_rounded_heavy.ttf"
                         )
                     ),
                     contentDescription = null
@@ -145,7 +145,7 @@ fun MyWidgetContent(context: Context, currentAQI: Int?) {
                             textColor = Color.White,
                             backgroundColor = themeColor,
                             fontSize = 24f,
-                            fontFamily = "fonts/SF-Pro-Regular.ttf",
+                            fontFamily = "fonts/sf_pro_regular.ttf",
                             horizontalPadding = 8,
                             verticalPadding = 6,
                             cornerRadius = 32f,

@@ -3,6 +3,7 @@ package com.aerocast.widgetapp.data
 import kotlinx.serialization.Serializable
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import android.util.Log
 
 @Serializable
 data class AQIResponse(
@@ -28,9 +29,23 @@ object AQIRepository {
 
         val forecasts = aqi_forecasts.get("forecasts") as List<Map<String, Any>>
 
+        Log.d(
+            "AQIRepository",
+            "Forecasts: $forecasts"
+        )
+
+        val forecastAqi = forecasts.map {
+            (it["predicted_aqi"] as Long).toInt()
+        }
+
+        Log.d(
+            "AQIRepository",
+            "Forecast AQI: $forecastAqi"
+        )
+
         return AQIResponse(
             currentAqi = historical_aqi.getDouble("aqi")?.toInt() ?: 0,
-            forecastAqi = forecasts.map { (it["predicted_aqi"] as Double).toInt() }
+            forecastAqi = forecastAqi
         )
 
         // return AQIResponse(
