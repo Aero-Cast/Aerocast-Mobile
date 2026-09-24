@@ -146,7 +146,7 @@ fun ForecastWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<
                         text = weekday,
                         textColor = Color(0xFF00361C),
                         fontSize = 16f,
-                        fontFamily = "fonts/SF-Pro-Rounded-Heavy.ttf",
+                        fontFamily = "fonts/sf_pro_rounded_heavy.ttf",
                     )
                 )
             )
@@ -161,7 +161,7 @@ fun ForecastWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<
                         text = date,
                         textColor = Color(0xFF00361C),
                         fontSize = 12f,
-                        fontFamily = "fonts/SF-Pro-Regular.ttf",
+                        fontFamily = "fonts/sf_pro_regular.ttf",
                     )
                 )
             )
@@ -176,7 +176,7 @@ fun ForecastWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<
                         text = aqi?.toString() ?: "-",
                         textColor = aqiColor,
                         fontSize = 27f,
-                        fontFamily = "fonts/SF-Pro-Rounded-Heavy.ttf",
+                        fontFamily = "fonts/sf_pro_rounded_heavy.ttf",
                     )
                 )
             )
@@ -191,7 +191,7 @@ fun ForecastWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<
                         text = category,
                         textColor = aqiColor,
                         fontSize = 12f,
-                        fontFamily = "fonts/SF-Pro-Regular.ttf",
+                        fontFamily = "fonts/sf_pro_regular.ttf",
                     )
                 )
             )
@@ -223,7 +223,7 @@ fun ForecastWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<
                         textColor = Color.White,
                         backgroundColor = Color(0xFF00361C),
                         fontSize = 12f,
-                        fontFamily = "fonts/SF-Pro-Regular.ttf",
+                        fontFamily = "fonts/sf_pro_regular.ttf",
                         horizontalPadding = 8,
                         verticalPadding = 4,
                         cornerRadius = 32f,

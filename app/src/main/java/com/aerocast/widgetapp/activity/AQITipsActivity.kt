@@ -1,10 +1,14 @@
 package com.aerocast.widgetapp.activity
 
+import com.aerocast.widgetapp.R
 import android.os.Bundle
+import androidx.annotation.DrawableRes
+import android.graphics.Typeface
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,19 +16,21 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.*
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
 
 class AQITipsActivity : ComponentActivity() {
 
@@ -43,41 +49,81 @@ data class AdvisoryItemData(
     val title: String,
     val description: String,
     val cardBackgroundColor: Color,
-    val badgeBackgroundColor: Color
+    val badgeBackgroundColor: Color,
+    @DrawableRes val image: Int
 )
 
 @Composable
 fun AQITipsScreen() {
+    val screenWidth = LocalConfiguration.current.screenWidthDp
+
+    val headerFontSize = when {
+        screenWidth < 360 -> 20.sp
+        screenWidth < 400 -> 24.sp
+        screenWidth < 450 -> 26.sp
+        else -> 28.sp
+    }
+
+    val topicFontSize = when {
+        screenWidth < 360 -> 20.sp
+        screenWidth < 400 -> 23.sp
+        screenWidth < 450 -> 26.sp
+        else -> 28.sp
+    }
+
+    val descriptionFontSize = when {
+        screenWidth < 360 -> 13.sp
+        screenWidth < 400 -> 15.sp
+        screenWidth < 450 -> 17.sp
+        else -> 20.sp
+    }
+
+    val descriptionLineHeight = when {
+        screenWidth < 360 -> 18.sp
+        screenWidth < 400 -> 20.sp
+        screenWidth < 450 -> 22.sp
+        else -> 24.sp
+    }
+
     val warmBackground = Color(0xFFFAF6EE)
     val yellowCardBg = Color(0xFFFFF2D1)
     val blueCardBg = Color(0xFFE2F0FE)
     val redBadgeBg = Color(0xFF6B0B0B)
     val tealBadgeBg = Color(0xFF0C4E5E)
 
+    val SFpro = FontFamily(
+        Font(R.font.sf_pro_regular, FontWeight.Normal),
+        Font(R.font.sf_pro_semi_bold, FontWeight.SemiBold)
+    )
+
     val advisories = listOf(
         AdvisoryItemData(
             title = "Wear Mask Outside",
             description = "Air pollution just elevated, wearing a mask to reduce exposure to harmful particles.",
             cardBackgroundColor = yellowCardBg,
-            badgeBackgroundColor = redBadgeBg
+            badgeBackgroundColor = redBadgeBg,
+            image = R.drawable.mask_image
         ),
         AdvisoryItemData(
             title = "Avoid Traffic",
             description = "Stay away from busy roads to limit exposure to exhaust fumes, which can worsen breathing.",
             cardBackgroundColor = yellowCardBg,
-            badgeBackgroundColor = redBadgeBg
+            badgeBackgroundColor = redBadgeBg,
+            image = R.drawable.traffic_image
         ),
         AdvisoryItemData(
             title = "Keep Windows Closed",
             description = "Keeping windows closed helps prevent polluted air from entering indoors.",
             cardBackgroundColor = yellowCardBg,
-            badgeBackgroundColor = redBadgeBg
+            badgeBackgroundColor = redBadgeBg,
+            image = R.drawable.windows_image
         ),
         AdvisoryItemData(
             title = "Limit Outdoor Chores",
             description = "Limiting outdoor activities helps prevent breathing difficulties, especially for sensitive group.",
             cardBackgroundColor = blueCardBg,
-            badgeBackgroundColor = tealBadgeBg
+            badgeBackgroundColor = tealBadgeBg,
+            image = R.drawable.skycraper_image
         )
     )
 
@@ -99,9 +145,12 @@ fun AQITipsScreen() {
             item {
                 Text(
                     text = "Health Advisory",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    fontSize = headerFontSize,
+                    color = Color.Black,
+                    fontFamily = SFpro,
+                    fontWeight = FontWeight.SemiBold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
 
@@ -110,14 +159,15 @@ fun AQITipsScreen() {
             }
 
             item {
-                Spacer(Modifier.height(14.dp))
+                Spacer(Modifier.height(10.dp))
 
                 Text(
                     text = "What causes bad air quality?",
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold,
-                    lineHeight = 32.sp,
-                    modifier = Modifier.fillMaxWidth()
+                    fontSize = topicFontSize,
+                    lineHeight = 28.sp,
+                    modifier = Modifier.fillMaxWidth(),
+                    fontFamily = SFpro,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
 
@@ -126,8 +176,7 @@ fun AQITipsScreen() {
                     append("Bad air quality happens when tiny particles and harmful gases get into the air. ")
                     withStyle(
                         SpanStyle(
-                            fontWeight = FontWeight.Bold,
-                            fontStyle = FontStyle.Italic
+                            fontWeight = FontWeight.Bold
                         )
                     ) {
                         append("These come from cars, factories, power plants, and even burning wood or trash.")
@@ -137,10 +186,37 @@ fun AQITipsScreen() {
 
                 Text(
                     text = causesText,
-                    fontSize = 15.sp,
-                    lineHeight = 20.sp,
+                    fontSize = descriptionFontSize,
+                    lineHeight = descriptionLineHeight,
                     color = Color(0xFF222222),
-                    fontFamily = FontFamily.SansSerif
+                    fontFamily = SFpro,
+                    fontWeight = FontWeight.Normal
+                )
+            }
+
+            item {
+                Spacer(Modifier.height(14.dp))
+
+                Text(
+                    text = "Effects of Long Term Exposure",
+                    fontSize = topicFontSize,
+                    lineHeight = 28.sp,
+                    fontFamily = SFpro,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            item {
+                val effectsText = "Chronic exposure is linked to a permanent 10% to 15% reduction in lung capacity over a decade, even in healthy adults. Long-term exposure keeps your body in a state of \"systemic inflammation.\" This is a leading cause of secondary issues like Type 2 Diabetes and accelerated cognitive aging."
+
+                Text(
+                    text = effectsText,
+                    fontSize = descriptionFontSize,
+                    lineHeight = descriptionLineHeight,
+                    color = Color(0xFF222222),
+                    fontFamily = SFpro,
+                    fontWeight = FontWeight.Normal
                 )
             }
 
@@ -153,6 +229,42 @@ fun AQITipsScreen() {
 
 @Composable
 fun AdvisoryCard(data: AdvisoryItemData) {
+
+    val screenWidth = LocalConfiguration.current.screenWidthDp
+
+    val titleFontSize = when {
+        screenWidth < 360 -> 12.sp
+        screenWidth < 400 -> 15.sp
+        screenWidth < 450 -> 18.sp
+        else -> 20.sp
+    }
+
+    val descriptionFontSize = when {
+        screenWidth < 360 -> 15.sp
+        screenWidth < 400 -> 16.sp
+        screenWidth < 450 -> 20.sp
+        else -> 23.sp
+    }
+
+    val descriptionLineHeight = when {
+        screenWidth < 360 -> 14.sp
+        screenWidth < 400 -> 17.sp
+        screenWidth < 450 -> 20.sp
+        else -> 23.sp
+    }
+
+    val imageSize = when {
+        screenWidth < 360 -> 75.dp
+        screenWidth < 400 -> 90.dp
+        screenWidth < 450 -> 110.dp
+        else -> 110.dp
+    }
+
+    val SFpro = FontFamily(
+        Font(R.font.sf_pro_regular, FontWeight.Normal),
+        Font(R.font.sf_pro_semi_bold, FontWeight.SemiBold)
+    )
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -164,19 +276,14 @@ fun AdvisoryCard(data: AdvisoryItemData) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Image Placeholder: Replace this Box with Image(...) once you add your assets
-            Box(
+            Image(
+                painter = painterResource(id = data.image),
+                contentDescription = data.title,
                 modifier = Modifier
-                    .size(90.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color.LightGray),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Image",
-                    fontSize = 12.sp,
-                    color = Color.DarkGray
-                )
-            }
+                    .size(imageSize)
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop
+            )
 
             Spacer(modifier = Modifier.width(12.dp))
 
@@ -194,8 +301,9 @@ fun AdvisoryCard(data: AdvisoryItemData) {
                     Text(
                         text = data.title,
                         color = Color.White,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold
+                        fontSize = titleFontSize,
+                        fontFamily = SFpro,
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
 
@@ -204,22 +312,13 @@ fun AdvisoryCard(data: AdvisoryItemData) {
                 // Description Text
                 Text(
                     text = data.description,
-                    fontSize = 13.sp,
-                    lineHeight = 17.sp,
+                    fontSize = descriptionFontSize,
+                    lineHeight = descriptionLineHeight,
                     color = Color(0xFF2B2B2B),
+                    fontFamily = SFpro,
                     fontWeight = FontWeight.Normal
                 )
             }
         }
     }
-}
-
-@Preview(
-    showBackground = true,
-    widthDp = 360,
-    heightDp = 800
-)
-@Composable
-fun AQITipsScreenPreview() {
-    AQITipsScreen()
 }
