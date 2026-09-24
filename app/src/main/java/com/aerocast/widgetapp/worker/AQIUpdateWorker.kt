@@ -31,7 +31,6 @@ class AQIUpdateWorker(
             //     TimeUnit.MINUTES
             // )
 
-            // For testing purposes, we can use a shorter interval
             val requestBuilder = OneTimeWorkRequestBuilder<AQIUpdateWorker>()
                 .setInitialDelay(10, TimeUnit.SECONDS)
                 .build()
@@ -142,8 +141,6 @@ class AQIUpdateWorker(
                 )
 
             if (runAttemptCount < 3) {
-                // Exponential backoff strategy will avoid the request to repeat
-                // too fast in case of failures.
                 Result.retry()
             } else {
                 Result.failure()
@@ -151,9 +148,6 @@ class AQIUpdateWorker(
         }
     }
 
-    /**
-     * Update the state of all widgets and then force update UI
-     */
     private suspend fun setWidgetState(
         glanceIds: List<GlanceId>,
         newState: AQIInfo,

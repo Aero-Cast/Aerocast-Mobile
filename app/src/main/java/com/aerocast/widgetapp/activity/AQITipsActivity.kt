@@ -44,7 +44,6 @@ class AQITipsActivity : ComponentActivity() {
     }
 }
 
-// Data model for advisory items
 data class AdvisoryItemData(
     val title: String,
     val description: String,
@@ -275,7 +274,6 @@ fun AdvisoryCard(data: AdvisoryItemData) {
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Image Placeholder: Replace this Box with Image(...) once you add your assets
             Image(
                 painter = painterResource(id = data.image),
                 contentDescription = data.title,
@@ -287,11 +285,9 @@ fun AdvisoryCard(data: AdvisoryItemData) {
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            // Content Area (Pill Header + Description)
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                // Pill Title Badge
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(50))
@@ -309,7 +305,6 @@ fun AdvisoryCard(data: AdvisoryItemData) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Description Text
                 Text(
                     text = data.description,
                     fontSize = descriptionFontSize,

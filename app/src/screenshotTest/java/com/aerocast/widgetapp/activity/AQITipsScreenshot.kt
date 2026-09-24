@@ -12,7 +12,7 @@ import com.android.tools.screenshot.PreviewTest
 )
 @Composable
 @PreviewTest
-fun AQITips320x640() = AQITipsScreen()
+fun AQITips320x640() = AQIForecastScreen()
 
 @Preview(
     name = "Phone Medium",
@@ -22,7 +22,7 @@ fun AQITips320x640() = AQITipsScreen()
 )
 @Composable
 @PreviewTest
-fun AQITips360x800() = AQITipsScreen()
+fun AQITips360x800() = AQIForecastScreen()
 
 @Preview(
     name = "Phone Large",
@@ -32,7 +32,7 @@ fun AQITips360x800() = AQITipsScreen()
 )
 @Composable
 @PreviewTest
-fun AQITips412x915() = AQITipsScreen()
+fun AQITips412x915() = AQIForecastScreen()
 
 @Preview(
     name = "My Phone",
@@ -42,4 +42,4 @@ fun AQITips412x915() = AQITipsScreen()
 )
 @Composable
 @PreviewTest
-fun AQITips451x1002() = AQITipsScreen()
+fun AQITips451x1002() = AQIForecastScreen()
