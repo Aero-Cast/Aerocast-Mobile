@@ -80,7 +80,7 @@ fun TipsWidgetContent(context: Context, currentAQI: Int?) {
             provider = ImageProvider(backgroundImage),
             contentDescription = null,
             modifier = GlanceModifier.fillMaxSize(),
-            contentScale = ContentScale.Fit
+            contentScale = ContentScale.FillBounds
         )
     }
 }

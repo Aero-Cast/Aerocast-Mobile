@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
+import androidx.glance.action.actionStartActivity
+import androidx.glance.action.clickable
 import androidx.glance.background
 import androidx.glance.Image
 import androidx.glance.ImageProvider
@@ -21,6 +23,7 @@ import com.aerocast.widgetapp.utils.createCustomTextBitmap
 import com.aerocast.widgetapp.utils.createPillTextBitmap
 import com.aerocast.widgetapp.state.AQIInfo
 import com.aerocast.widgetapp.state.AQIInfoStateDefinition
+import com.aerocast.widgetapp.activity.AQIForecastActivity
 import android.graphics.Bitmap
 
 
@@ -78,6 +81,9 @@ fun CurrentWidgetContent(context: Context, currentAQI: Int?) {
 
     Box(
         modifier = GlanceModifier.fillMaxSize()
+            .clickable(
+                actionStartActivity<AQIForecastActivity>()
+            )
     ) {
 
         Image(

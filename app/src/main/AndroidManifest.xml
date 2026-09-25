@@ -12,6 +12,10 @@
             android:name=".activity.AQITipsActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".activity.AQIForecastActivity"
+            android:exported="false" />
+
         <receiver
             android:name=".receivers.AQICurrentWidgetReceiver"
             android:exported="false">

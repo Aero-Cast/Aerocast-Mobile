@@ -18,7 +18,7 @@ object AQIRepository {
     suspend fun fetchAQI(): AQIResponse {
 
         val historical_aqi = db.collection("historical_aqi")
-            .document("2026-08-04")
+            .document("2026-09-24")
             .get()
             .await()
 
@@ -44,7 +44,7 @@ object AQIRepository {
         )
 
         return AQIResponse(
-            currentAqi = historical_aqi.getDouble("aqi")?.toInt() ?: 0,
+            currentAqi = historical_aqi.getDouble("actual_aqi")?.toInt() ?: 0,
             forecastAqi = forecastAqi
         )
 

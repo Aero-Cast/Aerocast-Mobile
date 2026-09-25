@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
+import androidx.glance.action.actionStartActivity
+import androidx.glance.action.clickable
 import androidx.glance.background
 import androidx.glance.Image
 import androidx.glance.ImageProvider
@@ -21,6 +23,7 @@ import com.aerocast.widgetapp.utils.createCustomTextBitmap
 import com.aerocast.widgetapp.utils.createPillTextBitmap
 import com.aerocast.widgetapp.state.AQIInfo
 import com.aerocast.widgetapp.state.AQIInfoStateDefinition
+import com.aerocast.widgetapp.activity.AQIForecastActivity
 import android.graphics.Bitmap
 
 
@@ -200,6 +203,9 @@ fun ForecastWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<
 
     Box(
         modifier = GlanceModifier.fillMaxSize()
+            .clickable(
+                actionStartActivity<AQIForecastActivity>()
+            )
     ) {
 
         Image(
@@ -237,27 +243,27 @@ fun ForecastWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<
                     .padding(top = 12.dp)
                     .wrapContentWidth()
             ) {
-                row_items("MON", "Aug 3", currentAqi, category, currentAqiColor)
+                row_items("THU", "Sep 24", currentAqi, category, currentAqiColor)
 
                 row_gap()
 
-                row_items("TUE", "Aug 4", forecastAqi?.getOrNull(0), getAqiCategory(forecastAqi?.getOrNull(0)), getAqiColor(forecastAqi?.getOrNull(0)))
+                row_items("FRI", "Sep 25", forecastAqi?.getOrNull(0), getAqiCategory(forecastAqi?.getOrNull(0)), getAqiColor(forecastAqi?.getOrNull(0)))
 
                 row_gap()
 
-                row_items("WED", "Aug 5", forecastAqi?.getOrNull(1), getAqiCategory(forecastAqi?.getOrNull(1)), getAqiColor(forecastAqi?.getOrNull(1)))
+                row_items("SAT", "Sep 26", forecastAqi?.getOrNull(1), getAqiCategory(forecastAqi?.getOrNull(1)), getAqiColor(forecastAqi?.getOrNull(1)))
 
                 row_gap()
 
-                row_items("THU", "Aug 6", forecastAqi?.getOrNull(2), getAqiCategory(forecastAqi?.getOrNull(2)), getAqiColor(forecastAqi?.getOrNull(2)))
+                row_items("SUN", "Sep 27", forecastAqi?.getOrNull(2), getAqiCategory(forecastAqi?.getOrNull(2)), getAqiColor(forecastAqi?.getOrNull(2)))
 
                 row_gap()
 
-                row_items("FRI", "Aug 7", forecastAqi?.getOrNull(3), getAqiCategory(forecastAqi?.getOrNull(3)), getAqiColor(forecastAqi?.getOrNull(3)))
+                row_items("MON", "Sep 28", forecastAqi?.getOrNull(3), getAqiCategory(forecastAqi?.getOrNull(3)), getAqiColor(forecastAqi?.getOrNull(3)))
 
                 row_gap()
 
-                row_items("SAT", "Aug 8", forecastAqi?.getOrNull(4), getAqiCategory(forecastAqi?.getOrNull(4)), getAqiColor(forecastAqi?.getOrNull(4)))
+                row_items("TUE", "Sep 29", forecastAqi?.getOrNull(4), getAqiCategory(forecastAqi?.getOrNull(4)), getAqiColor(forecastAqi?.getOrNull(4)))
             }
         }
     }
