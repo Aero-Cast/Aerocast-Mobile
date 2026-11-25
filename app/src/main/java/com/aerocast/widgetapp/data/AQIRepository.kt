@@ -1,13 +1,15 @@
+
 package com.aerocast.widgetapp.data
 
 import kotlinx.serialization.Serializable
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import android.util.Log
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 @Serializable
 data class AQIResponse(
-    val currentAqi: Int,
     val forecastAqi: List<Int>
 )
 
@@ -17,41 +19,34 @@ object AQIRepository {
 
     suspend fun fetchAQI(): AQIResponse {
 
-        val historical_aqi = db.collection("historical_aqi")
-            .document("2026-08-04")
-            .get()
-            .await()
+        // val startDate = java.time.LocalDate.parse("2026-10-20")
+        // val endDate = java.time.LocalDate.parse("2026-10-25")
 
-        val aqi_forecasts = db.collection("aqi_forecasts")
-            .document("latest")
-            .get()
-            .await()
+        val startDate = LocalDate.now()
+        val endDate = startDate.plusDays(5)
 
-        val forecasts = aqi_forecasts.get("forecasts") as List<Map<String, Any>>
+        // val forecastAqi = (0..java.time.temporal.ChronoUnit.DAYS
+        val forecastAqi = (0..ChronoUnit.DAYS
+            .between(startDate, endDate).toInt()).map { dayOffset ->
 
-        Log.d(
-            "AQIRepository",
-            "Forecasts: $forecasts"
-        )
+            val date = startDate.plusDays(dayOffset.toLong()).toString()
 
-        val forecastAqi = forecasts.map {
-            (it["predicted_aqi"] as Long).toInt()
+            val document = db.collection("historical_aqi")
+                .document(date)
+                .get()
+                .await()
+
+            val aqi = document.getDouble("aqi")?.toInt() ?: 0
+
+            Log.d("AQIRepository", "$date: $aqi")
+
+            aqi
         }
 
-        Log.d(
-            "AQIRepository",
-            "Forecast AQI: $forecastAqi"
-        )
+        Log.d("AQIRepository", "Forecast AQI: $forecastAqi")
 
         return AQIResponse(
-            currentAqi = historical_aqi.getDouble("aqi")?.toInt() ?: 0,
             forecastAqi = forecastAqi
         )
-
-        // return AQIResponse(
-        //     currentAqi = 50,
-        //     forecastAqi = listOf(40, 50, 60, 70, 80)
-        // )
-        
     }
 }

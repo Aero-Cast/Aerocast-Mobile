@@ -4,6 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
 
+@Composable
+private fun TestForecastScreen() {
+    AQITipsScreen()
+}
+
 @Preview(
     name = "Phone Small",
     showBackground = true,
@@ -12,7 +17,7 @@ import com.android.tools.screenshot.PreviewTest
 )
 @Composable
 @PreviewTest
-fun AQITips320x640() = AQITipsScreen()
+fun AQITips320x640() = TestForecastScreen()
 
 @Preview(
     name = "Phone Medium",
@@ -22,7 +27,7 @@ fun AQITips320x640() = AQITipsScreen()
 )
 @Composable
 @PreviewTest
-fun AQITips360x800() = AQITipsScreen()
+fun AQITips360x800() = TestForecastScreen()
 
 @Preview(
     name = "Phone Large",
@@ -32,14 +37,14 @@ fun AQITips360x800() = AQITipsScreen()
 )
 @Composable
 @PreviewTest
-fun AQITips412x915() = AQITipsScreen()
+fun AQITips412x915() = TestForecastScreen()
 
 @Preview(
     name = "My Phone",
     showBackground = true,
     widthDp = 451,
-    heightDp = 1002
+    heightDp = 1402
 )
 @Composable
 @PreviewTest
-fun AQITips451x1002() = AQITipsScreen()
+fun AQITips451x1402() = TestForecastScreen()
