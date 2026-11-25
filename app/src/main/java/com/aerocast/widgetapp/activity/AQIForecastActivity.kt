@@ -29,6 +29,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.aerocast.widgetapp.viewmodel.AQIForecastViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import java.time.LocalDate
 
 class AQIForecastActivity : ComponentActivity() {
 
@@ -37,7 +40,11 @@ class AQIForecastActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            AQIForecastScreen()
+            val viewModel: AQIForecastViewModel = viewModel()
+
+            AQIForecastScreen(
+                forecastAqi = viewModel.forecast
+            )
         }
     }
 }
@@ -62,43 +69,39 @@ data class DailyAqiData(
 )
 
 @Composable
-fun AQIForecastScreen() {
+fun AQIForecastScreen(
+    forecastAqi: List<Int>
+) {
     val pageBackground = Color(0xFFFAF6EE)
     val darkBrownText = Color(0xFF322100) 
 
-    val tomorrowAqi = 52;
+    val forecast = forecastAqi
+    val tomorrowAqi = forecast.getOrNull(1) ?: 0
 
-    val aqiChartData = listOf(
-        DailyAqiData(47, 24, "THU"),
-        DailyAqiData(52, 25, "FRI"),
-        DailyAqiData(52, 26, "SAT"),
-        DailyAqiData(51, 27, "SUN"),
-        DailyAqiData(51, 28, "MON"),
-        DailyAqiData(51, 29, "TUE")
-    )
+    val today = LocalDate.now()
 
-    val followingDays = listOf(
-        FollowingDayData(
-            score = 52,
-            date = "SEPTEMBER 26",
-            comparisonText = "A 0 difference since tomorrow."
-        ),
-        FollowingDayData(
-            score = 51,
-            date = "SEPTEMBER 27",
-            comparisonText = "A 1 difference since September 26."
-        ),
-        FollowingDayData(
-            score = 51,
-            date = "SEPTEMBER 28",
-            comparisonText = "A 0 difference since September 27."
-        ),
-        FollowingDayData(
-            score = 51,
-            date = "SEPTEMBER 29",
-            comparisonText = "A 0 difference since September 28."
+    val aqiChartData = forecast.mapIndexed { index, score ->
+        val date = today.plusDays((index).toLong())
+
+        DailyAqiData(
+            score = score,
+            dayNumber = date.dayOfMonth,
+            dayOfWeek = date.dayOfWeek.name.take(3)
         )
-    )
+    }
+
+    val followingDays = forecast.drop(2).mapIndexed { index, score ->
+        val date = today.plusDays((index + 2).toLong())
+        val previous = forecast[index + 1]
+        val previousDate = today.plusDays((index + 1).toLong())
+        val diff = score - previous
+
+        FollowingDayData(
+            score = score,
+            date = "${date.month.name} ${date.dayOfMonth}",
+            comparisonText = "A ${kotlin.math.abs(diff)} difference since ${previousDate.month.name.lowercase()} ${previousDate.dayOfMonth}."
+        )
+    }
 
     val screenWidth = LocalConfiguration.current.screenWidthDp
 
@@ -243,7 +246,7 @@ fun AQIForecastScreen() {
 
                     when (tomorrowAqi) {
                         in 0..50 -> {
-                            append(". Air quality is ideal for outdoor activities! It’s a great day to get outside, run your errands, or enjoy a walk in the park without any health concerns.")
+                            append(". Air quality is ideal for outdoor activities! It's a great day to get outside, run your errands, or enjoy a walk in the park without any health concerns.")
                         }
                         in 51..100 -> {
                             append(". It's not perfect, but it's a good window to get your errands done before the haze settles back in. If you've been putting off a trip to the market or need to get some outdoor chores finished, the morning hours are your best bet.")
@@ -269,6 +272,7 @@ fun AQIForecastScreen() {
                     lineHeight = dayAheadLineHeight,
                     color = Color(0xFF222222),
                     fontFamily = SFpro,
+                    textAlign = TextAlign.Justify,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -420,6 +424,7 @@ fun AqiChartSection(dataList: List<DailyAqiData>) {
     val ModerateOrange = Color(0xFFD3B301)
 
     val screenWidth = LocalConfiguration.current.screenWidthDp
+    val today = LocalDate.now()
 
     val topicFontSize = when {
         screenWidth < 360 -> 20.sp
@@ -454,7 +459,10 @@ fun AqiChartSection(dataList: List<DailyAqiData>) {
             fontFamily = SFpro
         )
         Text(
-            text = "Daily Overview • September 2026",
+            text = "Daily Overview • ${today.month.getDisplayName(
+                java.time.format.TextStyle.FULL,
+                java.util.Locale.ENGLISH
+            )} ${today.year}",
             color = LabelGrey,
             fontSize = subtopicFontSize,
             fontWeight = FontWeight.Normal,

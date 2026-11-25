@@ -9,6 +9,7 @@ import androidx.glance.appwidget.GlanceAppWidget
 import androidx.work.*
 import com.aerocast.widgetapp.widgets.AQICurrentWidget
 import com.aerocast.widgetapp.widgets.AQIForecastWidget
+import com.aerocast.widgetapp.widgets.AQITipsWidget
 import com.aerocast.widgetapp.state.AQIInfo
 import com.aerocast.widgetapp.state.AQIInfoStateDefinition
 import com.aerocast.widgetapp.data.AQIRepository
@@ -58,13 +59,16 @@ class AQIUpdateWorker(
 
         Log.d("AQIWorker", "Getting current widget IDs")
         val currentIds = manager.getGlanceIds(AQICurrentWidget::class.java)
-
         Log.d("AQIWorker", "Current widget IDs: $currentIds")
 
         Log.d("AQIWorker", "Getting forecast widget IDs")
         val forecastIds = manager.getGlanceIds(AQIForecastWidget::class.java)
-
         Log.d("AQIWorker", "Forecast widget IDs: $forecastIds")
+        
+        Log.d("AQIWorker", "Getting tips widget IDs")
+        val tipsIds = manager.getGlanceIds(AQITipsWidget::class.java)
+        Log.d("AQIWorker", "Tips widget IDs: $tipsIds")
+
 
         return try {
             Log.d("AQIWorker", "About to fetch AQI...")
@@ -72,7 +76,6 @@ class AQIUpdateWorker(
             val data = AQIRepository.fetchAQI()
 
             Log.d("AQIWorker", "AQI fetch completed!")
-            Log.d("AQIWorker", "Current AQI: ${data.currentAqi}")
             Log.d("AQIWorker", "Forecast AQI: ${data.forecastAqi}")
 
             setWidgetState(
@@ -88,9 +91,14 @@ class AQIUpdateWorker(
             )
 
             setWidgetState(
+                tipsIds,
+                AQIInfo.Loading,
+                AQITipsWidget()
+            )
+
+            setWidgetState(
                 currentIds,
                 AQIInfo.Available(
-                    currentAqi = data.currentAqi,
                     forecastAqi = data.forecastAqi
                 ),
                 AQICurrentWidget()
@@ -99,10 +107,17 @@ class AQIUpdateWorker(
             setWidgetState(
                 forecastIds,
                 AQIInfo.Available(
-                    currentAqi = data.currentAqi,
                     forecastAqi = data.forecastAqi
                 ),
                 AQIForecastWidget()
+            )
+
+            setWidgetState(
+                tipsIds,
+                AQIInfo.Available(
+                    forecastAqi = data.forecastAqi
+                ),
+                AQITipsWidget()
             )
 
             Log.d("AQIWorker", "Widget updated")
@@ -134,6 +149,13 @@ class AQIUpdateWorker(
                 AQIInfo.Unavailable(e.message.orEmpty()),
                 AQIForecastWidget()
             )
+
+            setWidgetState(
+                tipsIds,
+                AQIInfo.Unavailable(e.message.orEmpty()),
+                AQITipsWidget()
+            )
+
             Log.e(
                     "AQIWorker",
                     "Failed: ${e.message}",

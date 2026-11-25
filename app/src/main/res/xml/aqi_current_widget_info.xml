@@ -3,11 +3,12 @@
 <appwidget-provider
     xmlns:android="http://schemas.android.com/apk/res/android"
 
-    android:minWidth="200dp"
+    android:minWidth="300dp"
     android:minHeight="160dp"
-    android:targetCellWidth="5"
-    android:targetCellHeight="4"
+    android:targetCellWidth="4"
+    android:targetCellHeight="2"
     android:updatePeriodMillis="86400000"
     android:initialLayout="@layout/widget_placeholder"
+    android:previewImage="@drawable/aqi_current_widget_preview"
     android:resizeMode="none"
     android:widgetCategory="home_screen"/>

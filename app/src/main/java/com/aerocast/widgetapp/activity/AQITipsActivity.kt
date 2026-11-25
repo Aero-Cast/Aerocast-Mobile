@@ -52,6 +52,15 @@ data class AdvisoryItemData(
     @DrawableRes val image: Int
 )
 
+
+data class AQILevelData(
+    val range: String,
+    val category: String,
+    val description: String,
+    val color: Color
+)
+
+
 @Composable
 fun AQITipsScreen() {
     val screenWidth = LocalConfiguration.current.screenWidthDp
@@ -65,23 +74,9 @@ fun AQITipsScreen() {
 
     val topicFontSize = when {
         screenWidth < 360 -> 20.sp
-        screenWidth < 400 -> 23.sp
-        screenWidth < 450 -> 26.sp
-        else -> 28.sp
-    }
-
-    val descriptionFontSize = when {
-        screenWidth < 360 -> 13.sp
-        screenWidth < 400 -> 15.sp
-        screenWidth < 450 -> 17.sp
-        else -> 20.sp
-    }
-
-    val descriptionLineHeight = when {
-        screenWidth < 360 -> 18.sp
-        screenWidth < 400 -> 20.sp
-        screenWidth < 450 -> 22.sp
-        else -> 24.sp
+        screenWidth < 400 -> 28.sp
+        screenWidth < 450 -> 30.sp
+        else -> 38.sp
     }
 
     val warmBackground = Color(0xFFFAF6EE)
@@ -144,11 +139,10 @@ fun AQITipsScreen() {
             item {
                 Text(
                     text = "Health Advisory",
-                    fontSize = headerFontSize,
+                    fontSize = topicFontSize,
                     color = Color.Black,
                     fontFamily = SFpro,
                     fontWeight = FontWeight.SemiBold,
-                    textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -160,63 +154,7 @@ fun AQITipsScreen() {
             item {
                 Spacer(Modifier.height(10.dp))
 
-                Text(
-                    text = "What causes bad air quality?",
-                    fontSize = topicFontSize,
-                    lineHeight = 28.sp,
-                    modifier = Modifier.fillMaxWidth(),
-                    fontFamily = SFpro,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-
-            item {
-                val causesText = buildAnnotatedString {
-                    append("Bad air quality happens when tiny particles and harmful gases get into the air. ")
-                    withStyle(
-                        SpanStyle(
-                            fontWeight = FontWeight.Bold
-                        )
-                    ) {
-                        append("These come from cars, factories, power plants, and even burning wood or trash.")
-                    }
-                    append(" When the air is polluted, it can make breathing harder, irritate your lungs, and affect your heart and overall health.")
-                }
-
-                Text(
-                    text = causesText,
-                    fontSize = descriptionFontSize,
-                    lineHeight = descriptionLineHeight,
-                    color = Color(0xFF222222),
-                    fontFamily = SFpro,
-                    fontWeight = FontWeight.Normal
-                )
-            }
-
-            item {
-                Spacer(Modifier.height(14.dp))
-
-                Text(
-                    text = "Effects of Long Term Exposure",
-                    fontSize = topicFontSize,
-                    lineHeight = 28.sp,
-                    fontFamily = SFpro,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-
-            item {
-                val effectsText = "Chronic exposure is linked to a permanent 10% to 15% reduction in lung capacity over a decade, even in healthy adults. Long-term exposure keeps your body in a state of \"systemic inflammation.\" This is a leading cause of secondary issues like Type 2 Diabetes and accelerated cognitive aging."
-
-                Text(
-                    text = effectsText,
-                    fontSize = descriptionFontSize,
-                    lineHeight = descriptionLineHeight,
-                    color = Color(0xFF222222),
-                    fontFamily = SFpro,
-                    fontWeight = FontWeight.Normal
-                )
+                AirQualityIndexGuide()
             }
 
             item {
@@ -317,3 +255,198 @@ fun AdvisoryCard(data: AdvisoryItemData) {
         }
     }
 }
+
+@Composable
+fun AirQualityIndexGuide() {
+    val screenWidth = LocalConfiguration.current.screenWidthDp
+
+    val titleFontSize = when {
+        screenWidth < 360 -> 20.sp
+        screenWidth < 400 -> 28.sp
+        screenWidth < 450 -> 30.sp
+        else -> 38.sp
+    }
+
+    val cellFontSize = when {
+        screenWidth < 360 -> 15.sp
+        screenWidth < 400 -> 16.sp
+        screenWidth < 450 -> 20.sp
+        else -> 18.sp
+    }
+
+    val guidanceFontSize = when {
+        screenWidth < 360 -> 15.sp
+        screenWidth < 400 -> 16.sp
+        screenWidth < 450 -> 20.sp
+        else -> 18.sp
+    }
+
+    val sfPro = FontFamily(
+        Font(R.font.sf_pro_regular, FontWeight.Normal),
+        Font(R.font.sf_pro_semi_bold, FontWeight.SemiBold)
+    )
+
+    val levels = listOf(
+        AQILevelData(
+            range = "0-50",
+            category = "Good",
+            description = "Enjoy outdoor activities.",
+            color = Color(0xFFC5E1A5) // Soft green
+        ),
+        AQILevelData(
+            range = "51-100",
+            category = "Fair",
+            description = "Sensitive people should take care.",
+            color = Color(0xFFFFF59D) // Soft yellow
+        ),
+        AQILevelData(
+            range = "101-150",
+            category = "Unhealthy for Sensitive Groups",
+            description = "Sensitive groups should limit prolonged outdoor exertion.",
+            color = Color(0xFFFFCC80) // Soft orange
+        ),
+        AQILevelData(
+            range = "151-200",
+            category = "Unhealthy",
+            description = "Reduce prolonged outdoor activity.",
+            color = Color(0xFFEF9A9A) // Soft red
+        ),
+        AQILevelData(
+            range = "201-300",
+            category = "Very Unhealthy",
+            description = "Reduce outdoor exposure.",
+            color = Color(0xFFCE93D8) // Soft purple
+        ),
+        AQILevelData(
+            range = "301-500",
+            category = "Hazardous",
+            description = "Avoid outdoor exertion.",
+            color = Color(0xFF4A000B) // Dark maroon
+        )
+    )
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        // Section Header
+        Text(
+            text = "Air Quality Index Guide",
+            fontSize = titleFontSize,
+            fontFamily = sfPro,
+            fontWeight = FontWeight.SemiBold,
+            color = Color(0xFF322100)
+        )
+
+        Text(
+            text = "Understand the AQI levels and what they mean for your health.",
+            fontSize = cellFontSize,
+            fontFamily = sfPro,
+            color = Color(0xFF514A40)
+        )
+
+        // Column Header Titles
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "AQI",
+                modifier = Modifier.weight(0.85f),
+                fontSize = cellFontSize,
+                fontFamily = sfPro,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF322100)
+            )
+
+            Text(
+                text = "Category",
+                modifier = Modifier.weight(1.5f),
+                fontSize = cellFontSize,
+                fontFamily = sfPro,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF322100)
+            )
+
+            Text(
+                text = "Health Guidance",
+                modifier = Modifier.weight(1.8f),
+                fontSize = cellFontSize,
+                fontFamily = sfPro,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF322100)
+            )
+        }
+
+        // Rounded Cards for each AQI level
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            levels.forEach { level ->
+                AQIRowCard(
+                    level = level,
+                    cellFontSize = cellFontSize,
+                    guidanceFontSize = guidanceFontSize,
+                    sfPro = sfPro
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun AQIRowCard(
+    level: AQILevelData,
+    cellFontSize: androidx.compose.ui.unit.TextUnit,
+    guidanceFontSize: androidx.compose.ui.unit.TextUnit,
+    sfPro: FontFamily
+) {
+    // Determine text color based on background darkness for proper contrast
+    val textColor = if (level.color == Color(0xFF4A000B)) Color.White else Color(0xFF322100)
+    val descriptionTextColor = if (level.color == Color(0xFF4A000B)) Color(0xFFE0E0E0) else Color(0xFF423B30)
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(level.color)
+            .padding(horizontal = 12.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // AQI Range Column
+        Text(
+            text = level.range,
+            modifier = Modifier.weight(0.85f),
+            fontSize = cellFontSize,
+            fontFamily = sfPro,
+            fontWeight = FontWeight.SemiBold,
+            color = textColor
+        )
+
+        // Category Column
+        Text(
+            text = level.category,
+            modifier = Modifier.weight(1.5f),
+            fontSize = cellFontSize,
+            lineHeight = (cellFontSize.value + 3).sp,
+            fontFamily = sfPro,
+            fontWeight = FontWeight.SemiBold,
+            color = textColor
+        )
+
+        // Health Guidance Column
+        Text(
+            text = level.description,
+            modifier = Modifier.weight(1.8f),
+            fontSize = guidanceFontSize,
+            lineHeight = (guidanceFontSize.value + 3).sp,
+            fontFamily = sfPro,
+            fontWeight = FontWeight.Normal,
+            color = descriptionTextColor
+        )
+    }
+}
+

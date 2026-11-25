@@ -49,7 +49,7 @@ class AQICurrentWidget : GlanceAppWidget() {
                 is AQIInfo.Available -> {
                     CurrentWidgetContent(
                         context,
-                        state.currentAqi
+                        state.forecastAqi.firstOrNull()
                     )
                 }
 

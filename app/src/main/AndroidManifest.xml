@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:label="AeroCast Widget"
+        android:icon="@mipmap/ic_launcher"
         android:theme="@style/Theme.AeroCastWidget">
 
         <activity
             android:name=".activity.AQITipsActivity"
             android:exported="false" />
+        <!-- android:documentLaunchMode="always" /> -->
 
         <activity
             android:name=".activity.AQIForecastActivity"
