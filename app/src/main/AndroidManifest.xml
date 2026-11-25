@@ -1,23 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:label="AeroCast Widget">
-        
+        android:label="AeroCast Widget"
+        android:icon="@mipmap/ic_launcher"
+        android:theme="@style/Theme.AeroCastWidget">
+
+        <activity
+            android:name=".activity.AQITipsActivity"
+            android:exported="false" />
+        <!-- android:documentLaunchMode="always" /> -->
+
+        <activity
+            android:name=".activity.AQIForecastActivity"
+            android:exported="false" />
+
         <receiver
             android:name=".receivers.AQICurrentWidgetReceiver"
             android:exported="false">
 
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/aqi_current_widget_info"/>
+                android:resource="@xml/aqi_current_widget_info" />
         </receiver>
 
         <receiver
@@ -25,12 +35,25 @@
             android:exported="false">
 
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/aqi_forecast_widget_info"/>
+                android:resource="@xml/aqi_forecast_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".receivers.AQITipsWidgetReceiver"
+            android:exported="false">
+
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/aqi_tips_widget_info" />
         </receiver>
 
     </application>

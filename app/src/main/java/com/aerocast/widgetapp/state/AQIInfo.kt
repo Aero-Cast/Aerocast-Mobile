@@ -9,7 +9,6 @@ sealed interface AQIInfo {
 
     @Serializable
     data class Available(
-        val currentAqi: Int,
         val forecastAqi: List<Int>
     ) : AQIInfo
 

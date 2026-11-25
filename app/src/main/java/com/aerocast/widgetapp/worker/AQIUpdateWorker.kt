@@ -9,6 +9,7 @@ import androidx.glance.appwidget.GlanceAppWidget
 import androidx.work.*
 import com.aerocast.widgetapp.widgets.AQICurrentWidget
 import com.aerocast.widgetapp.widgets.AQIForecastWidget
+import com.aerocast.widgetapp.widgets.AQITipsWidget
 import com.aerocast.widgetapp.state.AQIInfo
 import com.aerocast.widgetapp.state.AQIInfoStateDefinition
 import com.aerocast.widgetapp.data.AQIRepository
@@ -31,7 +32,6 @@ class AQIUpdateWorker(
             //     TimeUnit.MINUTES
             // )
 
-            // For testing purposes, we can use a shorter interval
             val requestBuilder = OneTimeWorkRequestBuilder<AQIUpdateWorker>()
                 .setInitialDelay(10, TimeUnit.SECONDS)
                 .build()
@@ -53,16 +53,31 @@ class AQIUpdateWorker(
     }
 
     override suspend fun doWork(): Result {
-        Log.d("AQIWorker", "Worker started")
+        Log.d("AQIWorker", "===== WORKER STARTED =====")
+
         val manager = GlanceAppWidgetManager(applicationContext)
+
+        Log.d("AQIWorker", "Getting current widget IDs")
         val currentIds = manager.getGlanceIds(AQICurrentWidget::class.java)
+        Log.d("AQIWorker", "Current widget IDs: $currentIds")
+
+        Log.d("AQIWorker", "Getting forecast widget IDs")
         val forecastIds = manager.getGlanceIds(AQIForecastWidget::class.java)
+        Log.d("AQIWorker", "Forecast widget IDs: $forecastIds")
+        
+        Log.d("AQIWorker", "Getting tips widget IDs")
+        val tipsIds = manager.getGlanceIds(AQITipsWidget::class.java)
+        Log.d("AQIWorker", "Tips widget IDs: $tipsIds")
+
 
         return try {
+            Log.d("AQIWorker", "About to fetch AQI...")
+
             val data = AQIRepository.fetchAQI()
 
-            // Update state to indicate loading
-            Log.d("AQIWorker", "Fetching AQI")
+            Log.d("AQIWorker", "AQI fetch completed!")
+            Log.d("AQIWorker", "Forecast AQI: ${data.forecastAqi}")
+
             setWidgetState(
                 currentIds,
                 AQIInfo.Loading,
@@ -75,15 +90,15 @@ class AQIUpdateWorker(
                 AQIForecastWidget()
             )
 
-            // Update state with new data
-            Log.d(
-                "AQIWorker",
-                "AQI fetched: ${data.currentAqi}"
+            setWidgetState(
+                tipsIds,
+                AQIInfo.Loading,
+                AQITipsWidget()
             )
+
             setWidgetState(
                 currentIds,
                 AQIInfo.Available(
-                    currentAqi = data.currentAqi,
                     forecastAqi = data.forecastAqi
                 ),
                 AQICurrentWidget()
@@ -92,11 +107,18 @@ class AQIUpdateWorker(
             setWidgetState(
                 forecastIds,
                 AQIInfo.Available(
-                    currentAqi = data.currentAqi,
                     forecastAqi = data.forecastAqi
                 ),
                 AQIForecastWidget()
-)
+            )
+
+            setWidgetState(
+                tipsIds,
+                AQIInfo.Available(
+                    forecastAqi = data.forecastAqi
+                ),
+                AQITipsWidget()
+            )
 
             Log.d("AQIWorker", "Widget updated")
             val nextRequest = OneTimeWorkRequestBuilder<AQIUpdateWorker>()
@@ -127,6 +149,13 @@ class AQIUpdateWorker(
                 AQIInfo.Unavailable(e.message.orEmpty()),
                 AQIForecastWidget()
             )
+
+            setWidgetState(
+                tipsIds,
+                AQIInfo.Unavailable(e.message.orEmpty()),
+                AQITipsWidget()
+            )
+
             Log.e(
                     "AQIWorker",
                     "Failed: ${e.message}",
@@ -134,8 +163,6 @@ class AQIUpdateWorker(
                 )
 
             if (runAttemptCount < 3) {
-                // Exponential backoff strategy will avoid the request to repeat
-                // too fast in case of failures.
                 Result.retry()
             } else {
                 Result.failure()
@@ -143,9 +170,6 @@ class AQIUpdateWorker(
         }
     }
 
-    /**
-     * Update the state of all widgets and then force update UI
-     */
     private suspend fun setWidgetState(
         glanceIds: List<GlanceId>,
         newState: AQIInfo,

@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
+import androidx.glance.action.actionStartActivity
+import androidx.glance.action.clickable
 import androidx.glance.background
 import androidx.glance.Image
 import androidx.glance.ImageProvider
@@ -21,6 +23,9 @@ import com.aerocast.widgetapp.utils.createCustomTextBitmap
 import com.aerocast.widgetapp.utils.createPillTextBitmap
 import com.aerocast.widgetapp.state.AQIInfo
 import com.aerocast.widgetapp.state.AQIInfoStateDefinition
+import com.aerocast.widgetapp.activity.AQIForecastActivity
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import android.graphics.Bitmap
 
 
@@ -41,25 +46,27 @@ class AQIForecastWidget : GlanceAppWidget() {
         provideContent {
             when(state) {
                 is AQIInfo.Loading -> {
-                    MyWidgetContent(
+                    ForecastWidgetContent(
                         context,
-                        null,
                         null
                     )
                 }
 
                 is AQIInfo.Available -> {
-                    MyWidgetContent(
+                    android.util.Log.d(
+                        "AQIForecastWidget",
+                        "forecastAqi=${state.forecastAqi}"
+                    )
+
+                    ForecastWidgetContent(
                         context,
-                        state.currentAqi,
                         state.forecastAqi
                     )
                 }
 
                 is AQIInfo.Unavailable -> {
-                    MyWidgetContent(
+                    ForecastWidgetContent(
                         context,
-                        null,
                         null
                     )
                 }
@@ -69,61 +76,52 @@ class AQIForecastWidget : GlanceAppWidget() {
 }
 
 @Composable
-fun MyWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<Int>?) {
-    val category = when (currentAqi) {
-        null -> "..."
-        in 0..50 -> "Good"
-        in 51..100 -> "Moderate"
-        in 101..150 -> "Unhealthy for Sensitive Groups"
-        in 151..200 -> "Unhealthy"
-        in 201..300 -> "Very Unhealthy"
-        else -> "Hazardous"
+fun ForecastWidgetContent(context: Context, forecastAqi: List<Int>?) {
+    val backgroundImage: Int
+    val pillColor: Color
+    val today = LocalDate.now()
+    val currentAqi = forecastAqi?.firstOrNull()
+
+    if (currentAqi == null || currentAqi < 50) {
+        backgroundImage = R.drawable.good_aqi_forecast_background
+        pillColor = Color(0xFF00361C)
+    } else {
+        backgroundImage = R.drawable.bad_aqi_forecast_background
+        pillColor = Color(0xFF362300)
     }
 
     fun getAqiCategory(aqi: Int?): String {
         return when (aqi) {
             null -> "-"
-            in 0..50 -> "Good"
-            in 51..100 -> "Moderate"
-            in 101..150 -> "Unhealthy for Sensitive Groups"
-            in 151..200 -> "Unhealthy"
-            in 201..300 -> "Very Unhealthy"
+            in 0..49 -> "Good"
+            in 50..99 -> "Fair"
+            in 100..149 -> "Unhealthy for Sensitive Groups"
+            in 150..199 -> "Unhealthy"
+            in 200..299 -> "Very Unhealthy"
             else -> "Hazardous"
         }
     }
 
     val currentAqiColor = when (currentAqi) {
         null -> Color(0xFF00361C)
-        in 0..50 -> Color(0xFF00361C) // Green
-        in 51..100 -> Color(0xB87801) // Yellow
-        in 101..150 -> Color(0xB95600) // Orange
-        in 151..200 -> Color(0xB10909) // Red
-        in 201..300 -> Color(0x5E0063) // Purple
+        in 0..49 -> Color(0xFF00361C) // Green
+        in 50..99 -> Color(0xFFB87801) // Yellow
+        in 100..149 -> Color(0xFFB95600) // Orange
+        in 150..199 -> Color(0xFFB10909) // Red
+        in 200..299 -> Color(0xFF5E0063) // Purple
         else -> Color(0xA39E9E) // Gray
     }
 
     fun getAqiColor(aqi: Int?): Color {
         return when (aqi) {
             null -> Color(0xFF00361C)
-            in 0..50 -> Color(0xFF00361C)
-            in 51..100 -> Color(0xB87801)
-            in 101..150 -> Color(0xB95600)
-            in 151..200 -> Color(0xB10909)
-            in 201..300 -> Color(0x5E0063)
+            in 0..49 -> Color(0xFF00361C)
+            in 50..99 -> Color(0xFFB87801)
+            in 100..149 -> Color(0xFFB95600)
+            in 150..199 -> Color(0xFFB10909)
+            in 200..299 -> Color(0xFF5E0063)
             else -> Color(0xA39E9E)
         }
-    }
-
-    @Composable
-    fun row_gap() {
-        // Spacer( modifier = GlanceModifier.width(1.dp) )
-        // Spacer(
-        //     modifier = GlanceModifier
-        //         .width(1.dp)
-        //         .height(75.dp)
-        //         .background(ColorProvider(Color.Gray))
-        // )
-        // Spacer( modifier = GlanceModifier.width(4.dp) )
     }
 
     @Composable
@@ -141,7 +139,7 @@ fun MyWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<Int>?)
                         text = weekday,
                         textColor = aqiColor,
                         fontSize = 16f,
-                        fontFamily = "fonts/SF-Pro-Rounded-Heavy.ttf",
+                        fontFamily = "fonts/sf_pro_rounded_heavy.ttf",
                     )
                 )
             )
@@ -156,7 +154,7 @@ fun MyWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<Int>?)
                         text = date,
                         textColor = aqiColor,
                         fontSize = 12f,
-                        fontFamily = "fonts/SF-Pro-Regular.ttf",
+                        fontFamily = "fonts/sf_pro_regular.ttf",
                     )
                 )
             )
@@ -171,7 +169,7 @@ fun MyWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<Int>?)
                         text = aqi?.toString() ?: "-",
                         textColor = aqiColor,
                         fontSize = 27f,
-                        fontFamily = "fonts/SF-Pro-Rounded-Heavy.ttf",
+                        fontFamily = "fonts/sf_pro_rounded_heavy.ttf",
                     )
                 )
             )
@@ -183,10 +181,10 @@ fun MyWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<Int>?)
                 provider = ImageProvider(
                     createCustomTextBitmap(
                         context = context,
-                        text = category,
+                        text = getAqiCategory(currentAqi),
                         textColor = aqiColor,
                         fontSize = 12f,
-                        fontFamily = "fonts/SF-Pro-Regular.ttf",
+                        fontFamily = "fonts/sf_pro_regular.ttf",
                     )
                 )
             )
@@ -195,10 +193,13 @@ fun MyWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<Int>?)
 
     Box(
         modifier = GlanceModifier.fillMaxSize()
+            .clickable(
+                actionStartActivity<AQIForecastActivity>()
+            )
     ) {
 
         Image(
-            provider = ImageProvider(R.drawable.aqi_forecast_background),
+            provider = ImageProvider(backgroundImage),
             contentDescription = null,
             modifier = GlanceModifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -207,7 +208,7 @@ fun MyWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<Int>?)
         Column(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .padding(12.dp)
+                .padding(vertical = 12.dp, horizontal = 12.dp)
         ) {
             Image(
                 contentDescription = null,
@@ -216,9 +217,9 @@ fun MyWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<Int>?)
                         context = context,
                         text = "AQI Forecast in General Santos City",
                         textColor = Color.White,
-                        backgroundColor = Color(0xFF00361C),
+                        backgroundColor = pillColor,
                         fontSize = 12f,
-                        fontFamily = "fonts/SF-Pro-Regular.ttf",
+                        fontFamily = "fonts/sf_pro_regular.ttf",
                         horizontalPadding = 8,
                         verticalPadding = 4,
                         cornerRadius = 32f,
@@ -229,30 +230,25 @@ fun MyWidgetContent(context: Context, currentAqi: Int?, forecastAqi: List<Int>?)
             Row(
                 modifier = GlanceModifier
                     .fillMaxWidth()
-                    .padding(top = 12.dp)
-                    .wrapContentWidth()
+                    .padding(top = 12.dp, start = 24.dp)
             ) {
-                row_items("MON", "Aug 3", currentAqi, category, currentAqiColor)
+                (forecastAqi ?: emptyList()).take(6).forEachIndexed { index, aqi ->
+                    val date = today.plusDays(index.toLong())
 
-                row_gap()
-
-                row_items("TUE", "Aug 4", forecastAqi?.getOrNull(0), getAqiCategory(forecastAqi?.getOrNull(0)), getAqiColor(forecastAqi?.getOrNull(0)))
-
-                row_gap()
-
-                row_items("WED", "Aug 5", forecastAqi?.getOrNull(1), getAqiCategory(forecastAqi?.getOrNull(1)), getAqiColor(forecastAqi?.getOrNull(1)))
-
-                row_gap()
-
-                row_items("THU", "Aug 6", forecastAqi?.getOrNull(2), getAqiCategory(forecastAqi?.getOrNull(2)), getAqiColor(forecastAqi?.getOrNull(2)))
-
-                row_gap()
-
-                row_items("FRI", "Aug 7", forecastAqi?.getOrNull(3), getAqiCategory(forecastAqi?.getOrNull(3)), getAqiColor(forecastAqi?.getOrNull(3)))
-
-                row_gap()
-
-                row_items("SAT", "Aug 8", forecastAqi?.getOrNull(4), getAqiCategory(forecastAqi?.getOrNull(4)), getAqiColor(forecastAqi?.getOrNull(4)))
+                    Box(
+                        modifier = GlanceModifier
+                            .defaultWeight()
+                            .padding(horizontal = 1.dp)
+                    ) {
+                        row_items(
+                            date.dayOfWeek.name.take(3),
+                            date.format(DateTimeFormatter.ofPattern("MMM d")),
+                            aqi,
+                            getAqiCategory(aqi),
+                            getAqiColor(aqi)
+                        )
+                    }
+                }
             }
         }
     }
